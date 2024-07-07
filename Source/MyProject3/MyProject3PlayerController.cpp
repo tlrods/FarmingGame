@@ -53,6 +53,14 @@ void AMyProject3PlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Triggered, this, &AMyProject3PlayerController::OnTouchTriggered);
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Completed, this, &AMyProject3PlayerController::OnTouchReleased);
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Canceled, this, &AMyProject3PlayerController::OnTouchReleased);
+
+		InputComponent->BindAction("KeyPressedAction", EInputEvent::IE_Pressed, this, &AMyProject3PlayerController::KeyPressed);
+
+		EnhancedInputComponent->BindAction(MoveRightAction, ETriggerEvent::Triggered, this, &AMyProject3PlayerController::OnMoveRight);
+		EnhancedInputComponent->BindAction(MoveForwardAction, ETriggerEvent::Triggered, this, &AMyProject3PlayerController::OnMoveForward);
+
+		//InputComponent->BindAxis("MoveRight", this, &AMyProject3PlayerController::MoveRight);
+		//InputComponent->BindAxis("MoveForward", this, &AMyProject3PlayerController::MoveForward);
 	}
 	else
 	{
@@ -62,7 +70,7 @@ void AMyProject3PlayerController::SetupInputComponent()
 
 void AMyProject3PlayerController::OnInputStarted()
 {
-	StopMovement();
+	//StopMovement();
 }
 
 // Triggered every frame when the input is held down
@@ -122,4 +130,82 @@ void AMyProject3PlayerController::OnTouchReleased()
 {
 	bIsTouch = false;
 	OnSetDestinationReleased();
+}
+
+void AMyProject3PlayerController::MoveRight(float XAxis)
+{
+	APawn* ControlledPawn = GetPawn();
+	
+	FRotator Rotation = ControlledPawn->GetController()->GetControlRotation();
+	FRotator YawRotation(0.0f, Rotation.Yaw, 0.0f);
+
+	FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	ControlledPawn->AddMovementInput(RightDirection, XAxis);
+}
+
+void AMyProject3PlayerController::MoveForward(float ZAxis)
+{
+	APawn* ControlledPawn = GetPawn();
+
+	FRotator Rotation = ControlledPawn->GetController()->GetControlRotation();
+	FRotator YawRotation(0.0f, Rotation.Yaw, 0.0f);
+
+	FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	ControlledPawn->AddMovementInput(ForwardDirection, ZAxis);
+}
+
+void AMyProject3PlayerController::OnMoveRight()
+{
+	APawn* ControlledPawn = GetPawn();
+
+	FRotator Rotation = ControlledPawn->GetController()->GetControlRotation();
+	FRotator YawRotation(0.0f, Rotation.Yaw, 0.0f);
+
+	FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	ControlledPawn->AddMovementInput(RightDirection);
+}
+
+void AMyProject3PlayerController::OnMoveForward()
+{
+	APawn* ControlledPawn = GetPawn();
+
+	FRotator Rotation = ControlledPawn->GetController()->GetControlRotation();
+	FRotator YawRotation(0.0f, Rotation.Yaw, 0.0f);
+
+	FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	ControlledPawn->AddMovementInput(ForwardDirection);
+}
+
+void AMyProject3PlayerController::KeyPressed(FKey fKey)
+{
+	APawn* ControlledPawn = GetPawn();
+
+	if(WasInputKeyJustPressed(EKeys::AnyKey))
+	{
+		bool b = true;
+	}
+}
+
+void AMyProject3PlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	APawn* ControlledPawn = GetPawn();
+
+	if (IsInputKeyDown(EKeys::W))
+	{
+		ControlledPawn->AddMovementInput(FVector::ForwardVector, 1.0f, false);
+	}
+	if (IsInputKeyDown(EKeys::A))
+	{
+		ControlledPawn->AddMovementInput(FVector::LeftVector, 1.0f, false);
+	}
+	if (IsInputKeyDown(EKeys::S))
+	{
+		ControlledPawn->AddMovementInput(FVector::BackwardVector, 1.0f, false);
+	}
+	if (IsInputKeyDown(EKeys::D))
+	{
+		ControlledPawn->AddMovementInput(FVector::RightVector, 1.0f, false);
+	}
 }

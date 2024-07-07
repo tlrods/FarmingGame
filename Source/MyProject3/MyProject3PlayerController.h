@@ -22,6 +22,10 @@ class AMyProject3PlayerController : public APlayerController
 public:
 	AMyProject3PlayerController();
 
+	// Called every frame.
+	virtual void Tick(float DeltaSeconds) override;
+
+
 	/** Time Threshold to know if it was a short press */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	float ShortPressThreshold;
@@ -58,6 +62,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* SetRightMovementAction;
 
+	/** Left Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* KeyPressedAction;
+
+	/** Left Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* MoveRightAction;
+
+	/** Left Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* MoveForwardAction;
+
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
@@ -73,6 +89,15 @@ protected:
 	void OnSetDestinationReleased();
 	void OnTouchTriggered();
 	void OnTouchReleased();
+	void OnMoveRight();
+	void OnMoveForward();
+
+	void MoveRight(float XAxis);
+	void MoveForward(float ZAxis);
+
+	void KeyPressed(FKey fKey);
+
+	void Tick();
 
 private:
 	FVector CachedDestination;
