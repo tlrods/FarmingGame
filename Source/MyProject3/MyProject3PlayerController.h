@@ -74,6 +74,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* MoveForwardAction;
 
+	/** Jump Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* JumpAction;
+
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
@@ -96,6 +100,9 @@ protected:
 	void MoveForward(float ZAxis);
 
 	void KeyPressed(FKey fKey);
+
+	void Jump();
+	void StopJumping();
 
 	void Tick();
 

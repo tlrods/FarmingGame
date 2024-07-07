@@ -2,6 +2,7 @@
 
 #include "MyProject3PlayerController.h"
 #include "GameFramework/Pawn.h"
+#include "GameFramework/Character.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
@@ -58,6 +59,10 @@ void AMyProject3PlayerController::SetupInputComponent()
 
 		EnhancedInputComponent->BindAction(MoveRightAction, ETriggerEvent::Triggered, this, &AMyProject3PlayerController::OnMoveRight);
 		EnhancedInputComponent->BindAction(MoveForwardAction, ETriggerEvent::Triggered, this, &AMyProject3PlayerController::OnMoveForward);
+
+		// Jumping
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AMyProject3PlayerController::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AMyProject3PlayerController::StopJumping);
 
 		//InputComponent->BindAxis("MoveRight", this, &AMyProject3PlayerController::MoveRight);
 		//InputComponent->BindAxis("MoveForward", this, &AMyProject3PlayerController::MoveForward);
@@ -208,4 +213,14 @@ void AMyProject3PlayerController::Tick(float DeltaSeconds)
 	{
 		ControlledPawn->AddMovementInput(FVector::RightVector, 1.0f, false);
 	}
+}
+
+void AMyProject3PlayerController::Jump()
+{
+	GetCharacter()->Jump();
+}
+
+void AMyProject3PlayerController::StopJumping()
+{
+	GetCharacter()->StopJumping();
 }
