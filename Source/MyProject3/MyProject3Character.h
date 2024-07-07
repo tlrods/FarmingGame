@@ -6,6 +6,18 @@
 #include "GameFramework/Character.h"
 #include "MyProject3Character.generated.h"
 
+UENUM(BlueprintType)
+enum class EAnimationType : uint8
+{
+	Idle UMETA(DisplayName = "Idle"),
+	Run UMETA(DisplayName = "Run")
+};
+
+const TArray<FString> FlipbookPaths = {
+	"/Game/Animations/IdleAnimation",
+	"/Game/Animations/RunAnimation"
+};
+
 UCLASS(Blueprintable)
 class AMyProject3Character : public ACharacter
 {
@@ -22,7 +34,10 @@ public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
-	FORCEINLINE class UPaperSpriteComponent* GetPlayerSprite() const { return PlayerSprite; }
+	//FORCEINLINE class UPaperSpriteComponent* GetPlayerSprite() const { return PlayerSprite; }
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeFlipbook(EAnimationType animation);
 
 private:
 	/** Top down camera */
@@ -33,7 +48,16 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = PlayerSprite, meta = (AllowPrivateAccess = "true"))
-	class UPaperSpriteComponent* PlayerSprite;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = PlayerSprite, meta = (AllowPrivateAccess = "true"))
+	//class UPaperSpriteComponent* PlayerSprite;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation, meta = (AllowPrivateAccess = "true"))
+	class UPaperFlipbookComponent* Flipbook; // Your Flipbook component
+
+	UPROPERTY()
+	EAnimationType CurrentAnimationState = EAnimationType::Idle;
+
+	UPROPERTY()
+	FVector LastDirection;
 };
 

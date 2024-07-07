@@ -11,6 +11,8 @@
 #include "Materials/Material.h"
 #include "Engine/World.h"
 #include "PaperSpriteComponent.h"
+#include "PaperFlipbook.h"
+#include "PaperFlipbookComponent.h"
 
 AMyProject3Character::AMyProject3Character()
 {
@@ -47,10 +49,17 @@ AMyProject3Character::AMyProject3Character()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
 	//Paper2D Sprite Info
-	PlayerSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("PlayerSprite"));
-	PlayerSprite->SetupAttachment(RootComponent);
-	PlayerSprite->SetUsingAbsoluteRotation(true); 
-	PlayerSprite->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
+	//PlayerSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("PlayerSprite"));
+	//PlayerSprite->SetupAttachment(RootComponent);
+	//PlayerSprite->SetUsingAbsoluteRotation(true); 
+	//PlayerSprite->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
+
+	Flipbook = CreateDefaultSubobject<UPaperFlipbookComponent>(TEXT("Flipbook"));
+	Flipbook->SetupAttachment(RootComponent);
+	Flipbook->SetUsingAbsoluteRotation(true);
+	Flipbook->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
+
+
 	//FSpriteAssetInitParameters SpriteInit;
 	//static ConstructorHelpers::FObjectFinder<UTexture2D> TextureFinder(TEXT("Content/Assets/rember.uasset"));
 	//SpriteInit.Texture = TextureFinder.Object;
@@ -60,6 +69,56 @@ AMyProject3Character::AMyProject3Character()
 
 void AMyProject3Character::Tick(float DeltaSeconds)
 {
-	
+	bool isMoving = !GetCharacterMovement()->Velocity.IsZero();
+
+	if (isMoving && CurrentAnimationState != EAnimationType::Run)
+	{
+		CurrentAnimationState = EAnimationType::Run;
+		ChangeFlipbook(EAnimationType::Run);
+	}
+
+	if (!isMoving && CurrentAnimationState != EAnimationType::Idle)
+	{
+		CurrentAnimationState = EAnimationType::Idle;
+		ChangeFlipbook(EAnimationType::Idle);
+	}
+
+	FVector CurrentVelocity = GetCharacterMovement()->Velocity;
+
+	if (CurrentVelocity.Y != 0.0)
+	{
+		if (CurrentVelocity.Y > 0.0)
+		{
+			FRotator NewRotation(0.0, 90.0, 0.0);
+			Flipbook->SetWorldRotation(NewRotation);
+		}
+		if (CurrentVelocity.Y < 0.0)
+		{
+			FRotator NewRotation(0.0, -90.0, 0.0);
+			Flipbook->SetWorldRotation(NewRotation);
+		}
+	}
+
     Super::Tick(DeltaSeconds);
+}
+
+void AMyProject3Character::ChangeFlipbook(EAnimationType animation)
+{
+	FString FlipbookPath = FlipbookPaths[static_cast<int32>(animation)];
+
+	switch (animation)
+	{
+		case EAnimationType::Run:
+		{
+			UPaperFlipbook* LoadedFlipbook = LoadObject<UPaperFlipbook>(nullptr, *FlipbookPath);
+			Flipbook->SetFlipbook(LoadedFlipbook);
+			break;
+		}
+		case EAnimationType::Idle:
+		{
+			UPaperFlipbook* LoadedFlipbook = LoadObject<UPaperFlipbook>(nullptr, *FlipbookPath);
+			Flipbook->SetFlipbook(LoadedFlipbook);
+			break;
+		}
+	}
 }
